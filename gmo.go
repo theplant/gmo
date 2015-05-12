@@ -12,12 +12,13 @@ type GMO struct {
 	Version  string
 	SiteID   string
 	SitePass string
+	Debug    bool
 }
 
 type Params map[string]string
 
 func New(siteID string, sitePass string) *GMO {
-	return &GMO{Version: "3", SiteID: siteID, SitePass: sitePass, Endpoint: "https://pt01.mul-pay.jp"}
+	return &GMO{Version: "3", SiteID: siteID, SitePass: sitePass, Endpoint: "https://pt01.mul-pay.jp", Debug: false}
 }
 
 func (gmo *GMO) HandleRequest(action string, params *Params) (url.Values, error) {
@@ -28,7 +29,7 @@ func (gmo *GMO) HandleRequest(action string, params *Params) (url.Values, error)
 	)
 
 	defer func() {
-		if err != nil {
+		if err != nil && gmo.Debug {
 			fmt.Printf("%v\t%v\nGot Error: %v\n\n", action, values, err.Error())
 		}
 	}()
@@ -56,34 +57,34 @@ func (gmo *GMO) HandleRequest(action string, params *Params) (url.Values, error)
 	return results, err
 }
 
-func (gmo *GMO) RegisterMember(id, name string) {
+func (gmo *GMO) RegisterMember(id, name string) (url.Values, error) {
 	var params = Params{"MemberID": id, "MemberName": name}
-	gmo.HandleRequest("/payment/SaveMember.idPass", &params)
+	return gmo.HandleRequest("/payment/SaveMember.idPass", &params)
 }
 
-func (gmo *GMO) UpdateMember(id, name string) {
+func (gmo *GMO) UpdateMember(id, name string) (url.Values, error) {
 	var params = Params{"MemberID": id, "MemberName": name}
-	gmo.HandleRequest("/payment/UpdateMember.idPass", &params)
+	return gmo.HandleRequest("/payment/UpdateMember.idPass", &params)
 }
 
-func (gmo *GMO) SearchMember(id string) {
+func (gmo *GMO) SearchMember(id string) (url.Values, error) {
 	var params = Params{"MemberID": id}
-	gmo.HandleRequest("/payment/SearchMember.idPass", &params)
+	return gmo.HandleRequest("/payment/SearchMember.idPass", &params)
 }
 
-func (gmo *GMO) DeleteMember(id, name string) {
+func (gmo *GMO) DeleteMember(id string) (url.Values, error) {
 	var params = Params{"MemberID": id}
-	gmo.HandleRequest("/payment/DeleteMember.idPass", &params)
+	return gmo.HandleRequest("/payment/DeleteMember.idPass", &params)
 }
 
-func (gmo *GMO) SaveCard(cardno, expire, name string) {
-	// /payment/SaveCard.idPass
-
-	// CardSeq
-}
-
-func (gmo *GMO) DeleteCard(cardSeq string) {
-	// /payment/DeleteCard.idPass
-}
+// func (gmo *GMO) SaveCard(cardno, expire, name string) (url.Values, error){
+// 	// /payment/SaveCard.idPass
+//
+// 	// CardSeq
+// }
+//
+// func (gmo *GMO) DeleteCard(cardSeq string) (url.Values, error){
+// 	// /payment/DeleteCard.idPass
+// }
 
 // /payment/EntryTranPaypal.idPass
