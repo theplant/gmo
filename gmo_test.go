@@ -75,12 +75,13 @@ func TestCreateOrderWithSavedCard(t *testing.T) {
 	userID := fmt.Sprintf("%v", time.Now().UnixNano())
 	Client.RegisterMember(userID, "jinzhu")
 	Client.SaveCard(userID, "4111111111111111", "1219", "jinzhu")
-	orderID := "111111"
+	orderID := userID
 
 	if results, err := Client.EntryTran(orderID, "1000", "100"); checkErr(err, t) == nil {
-		fmt.Println(Client.ExecTran(results.Get("AccessID"), results.Get("AccessPass"), orderID, userID, "0", "123"))
+		if results, err := Client.ExecTran(results.Get("AccessID"), results.Get("AccessPass"), orderID, userID, "0", "123"); checkErr(err, t) != nil || results.Get("Approve") == "" {
+			t.Error("Should charge order with registered card")
+		}
 	} else {
-		fmt.Println(results)
 		t.Errorf("No error should happen when register order to GMO")
 	}
 }
