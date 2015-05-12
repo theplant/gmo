@@ -77,14 +77,19 @@ func (gmo *GMO) DeleteMember(id string) (url.Values, error) {
 	return gmo.HandleRequest("/payment/DeleteMember.idPass", &params)
 }
 
-// func (gmo *GMO) SaveCard(cardno, expire, name string) (url.Values, error){
-// 	// /payment/SaveCard.idPass
-//
-// 	// CardSeq
-// }
-//
-// func (gmo *GMO) DeleteCard(cardSeq string) (url.Values, error){
-// 	// /payment/DeleteCard.idPass
-// }
+func (gmo *GMO) SaveCard(memberID, cardNo, expire, holderName string) (url.Values, error) {
+	var params = Params{"MemberID": memberID, "CardNo": cardNo, "Expire": expire, "HolderName": holderName, "SeqMode": "1"}
+	return gmo.HandleRequest("/payment/SaveCard.idPass", &params)
+}
+
+func (gmo *GMO) SearchCard(memberID, cardSeq string) (url.Values, error) {
+	var params = Params{"MemberID": memberID, "CardSeq": cardSeq, "SeqMode": "1"}
+	return gmo.HandleRequest("/payment/SearchCard.idPass", &params)
+}
+
+func (gmo *GMO) DeleteCard(memberID, cardSeq string) (url.Values, error) {
+	var params = Params{"MemberID": memberID, "CardSeq": cardSeq, "SeqMode": "1"}
+	return gmo.HandleRequest("/payment/DeleteCard.idPass", &params)
+}
 
 // /payment/EntryTranPaypal.idPass
