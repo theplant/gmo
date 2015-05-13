@@ -119,3 +119,13 @@ func (gmo *GMO) ExecTran(accessID, accessPass, orderID, memberID, cardSeq, secur
 	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "OrderID": orderID, "MemberID": memberID, "CardSeq": cardSeq, "SecurityCode": securityCode, "SeqMode": "1", "Method": "1"}
 	return gmo.HandleSiteRequest("/payment/ExecTran.idPass", &params)
 }
+
+func (gmo *GMO) EntryTranPaypal(orderID, amount, tax, currency string) (url.Values, error) {
+	var params = Params{"OrderID": orderID, "JobCd": "CAPTURE", "Amount": amount, "Tax": tax, "Currency": currency}
+	return gmo.HandleShopRequest("/payment/EntryTranPaypal.idPass", &params)
+}
+
+func (gmo *GMO) ExecTranPaypal(accessID, accessPass, orderID, itemName, redirectURL string) (url.Values, error) {
+	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "OrderID": orderID, "ItemName": itemName, "RedirectURL": redirectURL}
+	return gmo.HandleShopRequest("/payment/ExecTranPaypal.idPass", &params)
+}

@@ -85,3 +85,18 @@ func TestCreateOrderWithSavedCard(t *testing.T) {
 		t.Errorf("No error should happen when register order to GMO")
 	}
 }
+
+func TestCreatePaypalOrder(t *testing.T) {
+	userID := fmt.Sprintf("%v", time.Now().UnixNano())
+	Client.RegisterMember(userID, "jinzhu")
+	Client.SaveCard(userID, "4111111111111111", "1219", "jinzhu")
+	orderID := userID
+
+	if results, err := Client.EntryTranPaypal(orderID, "1000", "100", "USD"); checkErr(err, t) == nil {
+		if _, err := Client.ExecTranPaypal(results.Get("AccessID"), results.Get("AccessPass"), orderID, "Test Order", "http://theplant.jp/gmo_redirect"); checkErr(err, t) != nil {
+			t.Error("Should charge order with registered card")
+		}
+	} else {
+		t.Errorf("No error should happen when register paypal order to GMO")
+	}
+}
