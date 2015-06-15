@@ -33,6 +33,15 @@ Client.HandleSiteRequest(action string, params *Params)
 Client.HandleShopRequest(action string, params *Params)
 ```
 
+== Test
+
+```sh
+# Confgure your test shop id, shop pass, etc through environments
+# This is a fake example, please register your own test account on Gmo website.
+
+SiteID=tsite00018881 SitePass=w2tya14a ShopID=tshop00018961 ShopPass=qfpevswx go test
+```
+
 == Author
 
 ThePlant, MIT License
