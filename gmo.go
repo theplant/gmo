@@ -54,11 +54,11 @@ func (gmo *GMO) HandleRawRequest(action string, values url.Values) (url.Values, 
 		results = url.Values{}
 	)
 
-	defer func() {
-		if err != nil && gmo.Debug {
-			fmt.Printf("%v\t%v\nGot Error: %v\n\n", action, values, err.Error())
-		}
-	}()
+	// defer func() {
+	// 	if err != nil && gmo.Debug {
+	// 		fmt.Printf("%v\t%v\nGot Error: %v\n\n", action, values, err.Error())
+	// 	}
+	// }()
 
 	if resp, err = http.PostForm(gmo.Endpoint+action, values); err == nil {
 		var bytes []byte
@@ -67,7 +67,7 @@ func (gmo *GMO) HandleRawRequest(action string, values url.Values) (url.Values, 
 				if errStr := results.Get("ErrCode"); errStr == "" {
 					return results, nil
 				} else {
-					err = fmt.Errorf("error code: %v", errStr)
+					err = fmt.Errorf("%v: %s", errStr, results.Get("ErrInfo"))
 				}
 			}
 		}
