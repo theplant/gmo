@@ -1,7 +1,9 @@
 package gmo_test
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -9,7 +11,13 @@ import (
 	"github.com/theplant/gmo"
 )
 
-var Client = gmo.New(os.Getenv("SiteID"), os.Getenv("SitePass"), os.Getenv("ShopID"), os.Getenv("ShopPass"))
+var Client = gmo.New(os.Getenv("SiteID"), os.Getenv("SitePass"), os.Getenv("ShopID"), os.Getenv("ShopPass"), gmo.TestEndpoint)
+
+func init() {
+	// Fox bypassing the test endpoint insecure certificate error:
+	//     "x509: certificate signed by unknown authority"
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+}
 
 func checkErr(err error, t *testing.T) error {
 	if err != nil {

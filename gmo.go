@@ -9,6 +9,11 @@ import (
 	"github.com/gorilla/schema"
 )
 
+const (
+	TestEndpoint       = "https://pt01.mul-pay.jp"
+	ProductionEndpoint = "https://p01.mul-pay.jp"
+)
+
 type GMO struct {
 	Endpoint string
 	Version  string
@@ -21,8 +26,15 @@ type GMO struct {
 
 type Params map[string]string
 
-func New(siteID, sitePass, shopID, shopPass string) *GMO {
-	return &GMO{Version: "3", SiteID: siteID, SitePass: sitePass, ShopID: shopID, ShopPass: shopPass, Endpoint: "https://pt01.mul-pay.jp"}
+func New(siteID, sitePass, shopID, shopPass, endPoint string) *GMO {
+	return &GMO{
+		Version:  "3",
+		SiteID:   siteID,
+		SitePass: sitePass,
+		ShopID:   shopID,
+		ShopPass: shopPass,
+		Endpoint: endPoint,
+	}
 }
 
 func (gmo *GMO) HandleSiteRequest(action string, params Params, output interface{}) error {
