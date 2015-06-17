@@ -158,3 +158,18 @@ func (gmo *GMO) ExecTranPaypal(accessID, accessPass, orderID, itemName, redirect
 	err = gmo.HandleShopRequest("/payment/ExecTranPaypal.idPass", params, &output)
 	return
 }
+
+const (
+	PaypalStatusPaySuccess = "CAPTURE"
+	PaypalStatusPayFail    = "PAYFAIL"
+)
+
+type PaypalReturnOutput struct {
+	ShopID   string
+	OrderID  string
+	Status   string
+	TranID   string
+	TranDate string
+	ErrCode  string
+	ErrInfo  string
+}
