@@ -71,13 +71,20 @@ func (gmo *GMO) HandleRawRequest(action string, params url.Values, output interf
 	results, err := url.ParseQuery(string(bytes))
 	if err != nil {
 		return
-	} else if errc := results.Get("ErrCode"); errc != "" {
-		err = fmt.Errorf("%v: %s", errc, results.Get("ErrInfo"))
-		return
 	}
 
 	decoder := schema.NewDecoder()
 	decoder.IgnoreUnknownKeys(true)
-	err = decoder.Decode(output, results)
+	errd := decoder.Decode(output, results)
+
+	if code := results.Get("ErrCode"); code != "" {
+		err = fmt.Errorf("%v: %s", code, results.Get("ErrInfo"))
+		return
+	}
+
+	if errd != nil {
+		err = errd
+	}
+
 	return
 }
