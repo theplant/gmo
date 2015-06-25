@@ -173,3 +173,69 @@ type PaypalReturnOutput struct {
 	ErrCode  string
 	ErrInfo  string
 }
+
+type ChangeTranOutput struct {
+	AccessID   string
+	AccessPass string
+	Forward    string
+	Approve    string
+	TranID     string
+	TranDate   string
+	ErrCode    string
+	ErrInfo    string
+}
+
+func (gmo *GMO) ChangeTran(accessID, accessPass, amount, tax string) (output ChangeTranOutput, err error) {
+	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "JobCd": "CAPTURE", "Amount": amount, "Tax": tax}
+	err = gmo.HandleShopRequest("/payment/ChangeTran.idPass", params, &output)
+	return
+}
+
+type CancelTranOutput struct {
+	AccessID   string
+	AccessPass string
+	Forward    string
+	Approve    string
+	TranID     string
+	TranDate   string
+	ErrCode    string
+	ErrInfo    string
+}
+
+func (gmo *GMO) CancelTran(accessID, accessPass string) (output CancelTranOutput, err error) {
+	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "JobCd": "VOID"}
+	err = gmo.HandleShopRequest("/payment/AlterTran.idPass", params, &output)
+	return
+}
+
+type SearchTradeOutput struct {
+	OrderID      string
+	Status       string
+	ProcessDate  string
+	JobCd        string
+	AccessID     string
+	AccessPass   string
+	ItemCode     string
+	Amount       string
+	Tax          string
+	SiteID       string
+	MemberID     string
+	CardNo       string
+	Expire       string
+	Method       string
+	PayTimes     string
+	Forward      string
+	TranID       string
+	Approve      string
+	ClientField1 string
+	ClientField2 string
+	ClientField3 string
+	ErrCode      string
+	ErrInfo      string
+}
+
+func (gmo *GMO) SearchTrade(orderID string) (output SearchTradeOutput, err error) {
+	var params = Params{"OrderID": orderID}
+	err = gmo.HandleShopRequest("/payment/SearchTrade.idPass", params, &output)
+	return
+}
