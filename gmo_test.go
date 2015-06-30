@@ -129,4 +129,30 @@ func TestPaypalOrderAPIs(t *testing.T) {
 	if _, err := Client.ExecTranPaypal(entryOutput.AccessID, entryOutput.AccessPass, orderID, "Test Order", "http://theplant.jp/gmo_redirect"); err != nil {
 		t.Error(err)
 	}
+
+	if searchOutput, err := Client.SearchTradeMulti(orderID, gmo.PayPal); err != nil {
+		t.Error(err)
+	} else if searchOutput.Amount != "1000" {
+		t.Error("Amount = %s; want 1000", searchOutput.Amount)
+	}
+
+	fmt.Println(fmt.Sprintf("%s/payment/PaypalStart.idPass?ShopID=%s&AccessID=%s", Client.Endpoint, Client.ShopID, entryOutput.AccessID))
+	fmt.Printf("SiteID=%s SitePass=%s ShopID=%s ShopPass=%s OrderID=%s AccessID=%s AccessPass=%s go test -run TestCancelTranPaypal\n", Client.SiteID, Client.SitePass, Client.ShopID, Client.ShopPass, orderID, entryOutput.AccessID, entryOutput.AccessPass)
+}
+
+func TestCancelTranPaypal(t *testing.T) {
+	orderID, accessID, accessPass := os.Getenv("OrderID"), os.Getenv("AccessID"), os.Getenv("AccessPass")
+	if orderID == "" || accessID == "" || accessPass == "" {
+		fmt.Println("To test TestCancelTranPaypal. Follow the URL printed by TestPaypalOrderAPIs and run the command also")
+		return
+	}
+	if _, err := Client.CancelTranPaypal(accessID, accessPass, orderID, "1000", "100"); err != nil {
+		t.Error(err)
+	}
+
+	if searchOutput, err := Client.SearchTradeMulti(orderID, gmo.PayPal); err != nil {
+		t.Error(err)
+	} else if searchOutput.Status != "CANCEL" {
+		t.Errorf("Status = %s; want CANCEL", searchOutput.Status)
+	}
 }

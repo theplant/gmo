@@ -239,3 +239,74 @@ func (gmo *GMO) SearchTrade(orderID string) (output SearchTradeOutput, err error
 	err = gmo.HandleShopRequest("/payment/SearchTrade.idPass", params, &output)
 	return
 }
+
+type CancelTranPaypalOutput struct {
+	OrderID  string
+	TranID   string
+	TranDate string
+	ErrCode  string
+	ErrInfo  string
+}
+
+func (gmo *GMO) CancelTranPaypal(accessID, accessPass, orderID, amount, tax string) (output CancelTranPaypalOutput, err error) {
+	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "OrderID": orderID, "Amount": amount, "Tax": tax}
+	err = gmo.HandleShopRequest("/payment/CancelTranPaypal.idPass", params, &output)
+	return
+}
+
+type SearchTradeMultiOutput struct {
+	Status           string
+	ProcessDate      string
+	JobCd            string
+	AccessID         string
+	AccessPass       string
+	ItemCode         string
+	Amount           string
+	Tax              string
+	SiteID           string
+	MemberID         string
+	CardNo           string
+	Expire           string
+	Method           string
+	PayTimes         string
+	Forward          string
+	TranID           string
+	Approve          string
+	ClientField1     string
+	ClientField2     string
+	ClientField3     string
+	PayType          string
+	CvsCode          string
+	CvsConfNo        string
+	CvsReceiptNo     string
+	EdyReceiptNo     string
+	EdyOrderNo       string
+	SuicaReceiptNo   string
+	SuicaOrderNo     string
+	CustID           string
+	BkCode           string
+	ConfNo           string
+	EncryptReceiptNo string
+	PaymentTerm      string
+	ErrCode          string
+	ErrInfo          string
+}
+
+type PayType string
+
+const (
+	Credit                  PayType = "0"
+	MobileSuica                     = "1"
+	MobileEdy                       = "2"
+	ConvenienceStorePayment         = "3"
+	PayEasy                         = "4"
+	PayPal                          = "5"
+	IDNet                           = "6"
+	WebMoney                        = "7"
+)
+
+func (gmo *GMO) SearchTradeMulti(orderID string, typ PayType) (output SearchTradeMultiOutput, err error) {
+	var params = Params{"OrderID": orderID, "PayType": string(typ)}
+	err = gmo.HandleShopRequest("/payment/SearchTradeMulti.idPass", params, &output)
+	return
+}
