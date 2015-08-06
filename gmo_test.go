@@ -64,7 +64,7 @@ func TestCardAPIs(t *testing.T) {
 	if output, err := Client.SearchCard(userID, seq); err != nil {
 		t.Error(err)
 	} else if output.HolderName != "Miss Tester" {
-		t.Error("HolderName = %s; want Miss Tester", output.HolderName)
+		t.Errorf("HolderName = %s; want Miss Tester", output.HolderName)
 	}
 
 	if _, err := Client.DeleteCard(userID, seq); err != nil {
@@ -77,6 +77,9 @@ func TestCardAPIs(t *testing.T) {
 	}
 }
 
+//
+// Workflow in Docs: 030_Protocol_Card(new).pdf:
+// 	2.10. Settlement with registered card inforamtion <without user authentication service>
 func TestCreditCardOrderAPIs(t *testing.T) {
 	userID := fmt.Sprintf("%v", time.Now().UnixNano())
 	if _, err := Client.RegisterMember(userID, "Mr Tetser"); err != nil {
@@ -89,7 +92,7 @@ func TestCreditCardOrderAPIs(t *testing.T) {
 
 	orderID := fmt.Sprintf("%v", time.Now().UnixNano())
 	t.Log("Order ID:", orderID)
-	entryOutput, err := Client.EntryTran(orderID, "1000", "100")
+	entryOutput, err := Client.EntryTran(orderID, "1000", "100", gmo.JobCdCapture)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -101,13 +104,75 @@ func TestCreditCardOrderAPIs(t *testing.T) {
 		t.Error("Approve should not be empty")
 	}
 
-	if _, err := Client.ChangeTran(entryOutput.AccessID, entryOutput.AccessPass, "1500", "100"); err != nil {
+	if _, err := Client.ChangeTran(entryOutput.AccessID, entryOutput.AccessPass, "1500", "100", gmo.JobCdCapture); err != nil {
 		t.Fatal(err)
 	}
 	if searchOutput, err := Client.SearchTrade(orderID); err != nil {
 		t.Error(err)
 	} else if searchOutput.Amount != "1500" {
-		t.Error("Amount = %s; want 1500", searchOutput.Amount)
+		t.Errorf("Amount = %s; want 1500", searchOutput.Amount)
+	}
+
+	if _, err := Client.CancelTran(entryOutput.AccessID, entryOutput.AccessPass); err != nil {
+		t.Fatal(err)
+	}
+	if searchOutput, err := Client.SearchTrade(orderID); err != nil {
+		t.Error(err)
+	} else if searchOutput.Status != "VOID" {
+		t.Errorf("Status = %s; want VOID", searchOutput.Status)
+	}
+}
+
+func TestCreditCardOrderAuthAPIs(t *testing.T) {
+	userID := fmt.Sprintf("%v", time.Now().UnixNano())
+	if _, err := Client.RegisterMember(userID, "Mr Tetser"); err != nil {
+		t.Fatal(err)
+	}
+	savedCard, err := Client.SaveCard(userID, "4111111111111111", "0101", "Mr Tetser")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	orderID := fmt.Sprintf("%v", time.Now().UnixNano())
+	t.Log("Order ID:", orderID)
+	entryOutput, err := Client.EntryTran(orderID, "1000", "100", gmo.JobCdAuth)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	execOutput, err := Client.ExecTran(entryOutput.AccessID, entryOutput.AccessPass, orderID, userID, savedCard.CardSeq, "0101")
+	if err != nil {
+		t.Error(err)
+	} else if execOutput.Approve == "" {
+		t.Error("Approve should not be empty")
+	}
+
+	if _, err := Client.ChangeTran(entryOutput.AccessID, entryOutput.AccessPass, "1500", "100", gmo.JobCdAuth); err != nil {
+		t.Fatal(err)
+	}
+	if searchOutput, err := Client.SearchTrade(orderID); err != nil {
+		t.Error(err)
+	} else {
+		if searchOutput.Amount != "1500" {
+			t.Errorf("Amount = %s; want 1500", searchOutput.Amount)
+		}
+		if searchOutput.Status != gmo.JobCdAuth {
+			t.Errorf("searchOutput.Status = %s; want %s", searchOutput.Status, gmo.JobCdAuth)
+		}
+	}
+
+	if _, err := Client.CaptureSales(entryOutput.AccessID, entryOutput.AccessPass, "1500"); err != nil {
+		t.Error(err)
+	}
+	if searchOutput, err := Client.SearchTrade(orderID); err != nil {
+		t.Error(err)
+	} else {
+		if searchOutput.Amount != "1500" {
+			t.Errorf("Amount = %s; want 1500", searchOutput.Amount)
+		}
+		if searchOutput.Status != gmo.JobCdSales {
+			t.Errorf("searchOutput.Status = %s; want %s", searchOutput.Status, gmo.JobCdSales)
+		}
 	}
 
 	if _, err := Client.CancelTran(entryOutput.AccessID, entryOutput.AccessPass); err != nil {
@@ -134,7 +199,7 @@ func TestPaypalOrderAPIs(t *testing.T) {
 	if searchOutput, err := Client.SearchTradeMulti(orderID, gmo.PayTypePayPal); err != nil {
 		t.Error(err)
 	} else if searchOutput.Amount != "1000" {
-		t.Error("Amount = %s; want 1000", searchOutput.Amount)
+		t.Errorf("Amount = %s; want 1000", searchOutput.Amount)
 	}
 
 	fmt.Println(fmt.Sprintf("%s/payment/PaypalStart.idPass?ShopID=%s&AccessID=%s", Client.Endpoint, Client.ShopID, entryOutput.AccessID))

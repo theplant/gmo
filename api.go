@@ -103,8 +103,22 @@ type EntryTranOutput struct {
 	ErrInfo    string
 }
 
-func (gmo *GMO) EntryTran(orderID, amount, tax string) (output EntryTranOutput, err error) {
-	var params = Params{"OrderID": orderID, "JobCd": "CAPTURE", "Amount": amount, "Tax": tax}
+const (
+	JobCdUnprocessed   = "UNPROCESSED"
+	JobCdAuthenticated = "AUTHENTICATED"
+	JobCdCheck         = "CHECK"
+	JobCdCapture       = "CAPTURE"
+	JobCdAuth          = "AUTH"
+	JobCdSales         = "SALES"
+	JobCdVoid          = "VOID"
+	JobCdReturn        = "RETURN"
+	JobCdReturnx       = "RETURNX"
+	JobCdSauth         = "SAUTH"
+)
+
+func (gmo *GMO) EntryTran(orderID, amount, tax string, jobcd string) (output EntryTranOutput, err error) {
+	// var params = Params{"OrderID": orderID, "JobCd": "CAPTURE", "Amount": amount, "Tax": tax}
+	var params = Params{"OrderID": orderID, "JobCd": jobcd, "Amount": amount, "Tax": tax}
 	err = gmo.HandleShopRequest("/payment/EntryTran.idPass", params, &output)
 	return
 }
@@ -217,9 +231,26 @@ type ChangeTranOutput struct {
 	ErrInfo    string
 }
 
-func (gmo *GMO) ChangeTran(accessID, accessPass, amount, tax string) (output ChangeTranOutput, err error) {
-	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "JobCd": "CAPTURE", "Amount": amount, "Tax": tax}
+func (gmo *GMO) ChangeTran(accessID, accessPass, amount, tax, jobcd string) (output ChangeTranOutput, err error) {
+	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "JobCd": jobcd, "Amount": amount, "Tax": tax}
 	err = gmo.HandleShopRequest("/payment/ChangeTran.idPass", params, &output)
+	return
+}
+
+type CaptureSalesOutput struct {
+	AccessID   string
+	AccessPass string
+	Forward    string
+	Approve    string
+	TranID     string
+	TranDate   string
+	ErrCode    string
+	ErrInfo    string
+}
+
+func (gmo *GMO) CaptureSales(accessID, accessPass, amount string) (output CaptureSalesOutput, err error) {
+	var params = Params{"AccessID": accessID, "AccessPass": accessPass, "JobCd": "SALES", "Amount": amount}
+	err = gmo.HandleShopRequest("/payment/AlterTran.idPass", params, &output)
 	return
 }
 
