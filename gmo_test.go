@@ -82,10 +82,10 @@ func TestCardAPIs(t *testing.T) {
 // 	2.10. Settlement with registered card inforamtion <without user authentication service>
 func TestCreditCardOrderAPIs(t *testing.T) {
 	userID := fmt.Sprintf("%v", time.Now().UnixNano())
-	if _, err := Client.RegisterMember(userID, "Mr Tetser"); err != nil {
+	if _, err := Client.RegisterMember(userID, "Mr Testser"); err != nil {
 		t.Fatal(err)
 	}
-	savedCard, err := Client.SaveCard(userID, "4111111111111111", "0101", "Mr Tetser")
+	savedCard, err := Client.SaveCard(userID, "4111111111111111", "0101", "Mr Testser")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,10 +125,10 @@ func TestCreditCardOrderAPIs(t *testing.T) {
 
 func TestCreditCardOrderAuthAPIs(t *testing.T) {
 	userID := fmt.Sprintf("%v", time.Now().UnixNano())
-	if _, err := Client.RegisterMember(userID, "Mr Tetser"); err != nil {
+	if _, err := Client.RegisterMember(userID, "Mr Testser"); err != nil {
 		t.Fatal(err)
 	}
-	savedCard, err := Client.SaveCard(userID, "4111111111111111", "0101", "Mr Tetser")
+	savedCard, err := Client.SaveCard(userID, "4111111111111111", "0101", "Mr Testser")
 	if err != nil {
 		t.Fatal(err)
 	}
