@@ -3,6 +3,7 @@ package gmo
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -21,7 +22,7 @@ type GMO struct {
 	SitePass string
 	ShopID   string
 	ShopPass string
-	// Debug    bool
+	Debug    bool
 }
 
 type Params map[string]string
@@ -60,6 +61,9 @@ func (gmo *GMO) HandleShopRequest(action string, params Params, output interface
 }
 
 func (gmo *GMO) HandleRawRequest(action string, params url.Values, output interface{}) (err error) {
+	if gmo.Debug {
+		log.Println("GMO Request [Debug]:", gmo.Endpoint+action)
+	}
 	resp, err := http.PostForm(gmo.Endpoint+action, params)
 	if err != nil {
 		return
