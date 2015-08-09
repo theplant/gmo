@@ -130,6 +130,27 @@ func (gmo *GMO) ExecTran(accessID, accessPass, orderID, memberID, cardSeq, secur
 	return
 }
 
+const (
+	CardStatusUnprocessed   = "UNPROCESSED"   // unsettled
+	CardStatusAuthenticated = "AUTHENTICATED" // unsettled (3D registration complete)
+	CardStatusCheck         = "CHECK"         // validity check
+	CardStatusCapture       = "CAPTURE"       // instant sales
+	CardStatusAuth          = "AUTH"          // authorization
+	CardStatusSales         = "SALES"         // sales capture
+	CardStatusVoid          = "VOID"          // cancellation
+	CardStatusReturn        = "RETURN"        // return goods
+	CardStatusReturnx       = "RETURNX"       // return goods next month
+	CardStatusSauth         = "SAUTH"         // simple authority
+
+	PayPalStatusUnprocessed = "UNPROCESSED" // unsettled
+	PayPalStatusReqsuccess  = "REQSUCCESS"  // request succeed
+	PayPalStatusPaysuccess  = "PAYSUCCESS"  // settlement completed *1
+	PayPalStatusPayfail     = "PAYFAIL"     // settlement failure
+	PayPalStatusExpired     = "EXPIRED"     // expired
+	PayPalStatusCapture     = "CAPTURE"     // instant sales
+	PayPalStatusCancel      = "CANCEL"      // cancellation
+)
+
 type EntryTranPaypalOutput struct {
 	OrderID    string
 	AccessID   string
@@ -159,10 +180,10 @@ func (gmo *GMO) ExecTranPaypal(accessID, accessPass, orderID, itemName, redirect
 	return
 }
 
-const (
-	PaypalStatusPaySuccess = "CAPTURE"
-	PaypalStatusPayFail    = "PAYFAIL"
-)
+// const (
+// 	PaypalStatusPaySuccess = "CAPTURE"
+// 	PaypalStatusPayFail    = "PAYFAIL"
+// )
 
 type PaypalReturnOutput struct {
 	ShopID   string
@@ -295,14 +316,14 @@ type SearchTradeMultiOutput struct {
 type PayType string
 
 const (
-	Credit                  PayType = "0"
-	MobileSuica                     = "1"
-	MobileEdy                       = "2"
-	ConvenienceStorePayment         = "3"
-	PayEasy                         = "4"
-	PayPal                          = "5"
-	IDNet                           = "6"
-	WebMoney                        = "7"
+	PayTypeCredit                  PayType = "0"
+	PayTypeMobileSuica                     = "1"
+	PayTypeMobileEdy                       = "2"
+	PayTypeConvenienceStorePayment         = "3"
+	PayTypePayEasy                         = "4"
+	PayTypePayPal                          = "5"
+	PayTypeIDNet                           = "6"
+	PayTypeWebMoney                        = "7"
 )
 
 func (gmo *GMO) SearchTradeMulti(orderID string, typ PayType) (output SearchTradeMultiOutput, err error) {

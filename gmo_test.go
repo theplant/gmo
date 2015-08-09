@@ -17,6 +17,7 @@ func init() {
 	// Fox bypassing the test endpoint insecure certificate error:
 	//     "x509: certificate signed by unknown authority"
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	Client.Debug = true
 }
 
 func TestMemberAPIs(t *testing.T) {
@@ -130,7 +131,7 @@ func TestPaypalOrderAPIs(t *testing.T) {
 		t.Error(err)
 	}
 
-	if searchOutput, err := Client.SearchTradeMulti(orderID, gmo.PayPal); err != nil {
+	if searchOutput, err := Client.SearchTradeMulti(orderID, gmo.PayTypePayPal); err != nil {
 		t.Error(err)
 	} else if searchOutput.Amount != "1000" {
 		t.Error("Amount = %s; want 1000", searchOutput.Amount)
@@ -150,7 +151,7 @@ func TestCancelTranPaypal(t *testing.T) {
 		t.Error(err)
 	}
 
-	if searchOutput, err := Client.SearchTradeMulti(orderID, gmo.PayPal); err != nil {
+	if searchOutput, err := Client.SearchTradeMulti(orderID, gmo.PayTypePayPal); err != nil {
 		t.Error(err)
 	} else if searchOutput.Status != "CANCEL" {
 		t.Errorf("Status = %s; want CANCEL", searchOutput.Status)
