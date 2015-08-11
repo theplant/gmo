@@ -1,5 +1,7 @@
 package gmo
 
+import "fmt"
+
 type RegisterMemberOutput struct {
 	MemberID string
 	ErrCode  string
@@ -144,12 +146,21 @@ const (
 
 	PayPalStatusUnprocessed = "UNPROCESSED" // unsettled
 	PayPalStatusReqsuccess  = "REQSUCCESS"  // request succeed
-	PayPalStatusPaysuccess  = "PAYSUCCESS"  // settlement completed *1
+	PayPalStatusPaysuccess  = "PAYSUCCESS"  // settlement completed
 	PayPalStatusPayfail     = "PAYFAIL"     // settlement failure
 	PayPalStatusExpired     = "EXPIRED"     // expired
 	PayPalStatusCapture     = "CAPTURE"     // instant sales
 	PayPalStatusCancel      = "CANCEL"      // cancellation
 )
+
+func (gmo *GMO) GetURLToPaypalPage(accessID string) string {
+	return fmt.Sprintf(
+		"%s/payment/PaypalStart.idPass?ShopID=%s&AccessID=%s",
+		gmo.Endpoint,
+		gmo.ShopID,
+		accessID,
+	)
+}
 
 type EntryTranPaypalOutput struct {
 	OrderID    string
