@@ -1,6 +1,7 @@
 package gmo
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -60,6 +61,8 @@ func (gmo *GMO) HandleShopRequest(action string, params Params, output interface
 	return gmo.HandleRawRequest(action, values, output)
 }
 
+var ErrOrderIDUsed = errors.New("order id used")
+
 func (gmo *GMO) HandleRawRequest(action string, params url.Values, output interface{}) (err error) {
 	if gmo.Debug {
 		log.Println("GMO Request [Debug]:", gmo.Endpoint+action)
@@ -82,7 +85,7 @@ func (gmo *GMO) HandleRawRequest(action string, params url.Values, output interf
 	errd := decoder.Decode(output, results)
 
 	if code := results.Get("ErrCode"); code != "" {
-		err = fmt.Errorf("%v: %s", code, results.Get("ErrInfo"))
+		err = fmtError(results)
 		return
 	}
 
@@ -91,4 +94,14 @@ func (gmo *GMO) HandleRawRequest(action string, params url.Values, output interf
 	}
 
 	return
+}
+
+func fmtError(results url.Values) error {
+	code := results.Get("ErrCode")
+	info := results.Get("ErrInfo")
+	if code == "E01" && info == "E01040010" {
+		return ErrOrderIDUsed
+	}
+
+	return fmt.Errorf("%v: %s", code, info)
 }
