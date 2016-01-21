@@ -71,6 +71,7 @@ func (gmo *GMO) HandleRawRequest(action string, params url.Values, output interf
 	if err != nil {
 		return
 	}
+	defer resp.Body.Close()
 	bytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return
